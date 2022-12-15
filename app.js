@@ -10,7 +10,6 @@ app.set("PORT", process.env.PORT || 8080);
 app.use(express.static(path.join(__dirname, "views")));
 
 app.get("/", function (req, res, next) {
-  // res.send('<h1>'+ 'testing' + '</h1>')
   res.sendFile("index.html"); //, { root: path.join(__dirname, 'views') })
 });
 

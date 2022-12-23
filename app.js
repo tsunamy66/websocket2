@@ -2,7 +2,7 @@ const path = require("path");
 const express = require("express");
 const session = require('express-session');
 
-const userRouter = require("./routes/4userRouter");
+const userRouter = require("./routes/3userController");
 
 const app = express();
 

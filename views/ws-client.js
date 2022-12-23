@@ -3,7 +3,7 @@ const HOST = location.origin.replace(/^http/, 'ws')  //'ws://localhost:8080'
 const ws = new WebSocket(HOST)
 
 ws.onopen = function(){
-    ws.send('i am connected')
+    // ws.send('i am connected')
     setTiltle('connected to Cyber Chat')
 }
 ws.onclose = function(){

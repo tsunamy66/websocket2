@@ -1,10 +1,12 @@
 const { WebSocketServer } = require("ws");
-const server = require("./app");
+const http = require('http')
+const app = require("./app");
+
+const server = http.createServer(app);
 
 var wss = new WebSocketServer({ server });
 
 wss.on("connection", function connection(ws) {
-  console.log(typeof ws);
   ws.on("message", function message(message) {
     if (message.toString() === "exit") {
       ws.close();
@@ -17,6 +19,10 @@ wss.on("connection", function connection(ws) {
     console.log("SERVER SIDE::", message.toString());
   });
   ws.send("Hello World!!");
+});
+
+server.listen(app.get("PORT"), () => {
+  console.log(`server is listening on port ${app.get("PORT")}`);
 });
 
 console.log("websocket server is running ");

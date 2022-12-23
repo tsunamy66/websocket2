@@ -1,21 +1,26 @@
-const http = require("http");
 const path = require("path");
 const express = require("express");
+const session = require('express-session');
+
+const userRouter = require("./routes/4userRouter");
+
 const app = express();
 
-app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 app.set("PORT", process.env.PORT || 8080);
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "views")));
 
+app.use('/',userRouter)
+
 app.get("/", function (req, res, next) {
-  res.sendFile("index.html"); //, { root: path.join(__dirname, 'views') })
+  res.render("home");
+});
+app.get("/chat", function (req, res, next) {
+  res.render("chat")
 });
 
-const server = http.createServer(app);
-server.listen(app.get("PORT"), () => {
-  console.log(`server is listening on port ${app.get("PORT")}`);
-});
-
-module.exports = server;
+module.exports = app;

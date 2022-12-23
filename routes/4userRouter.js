@@ -1,14 +1,36 @@
-const express = require("express");
-const { signupGet, signupPost, loginGet, loginPost } = require('./3userController')
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
+const crypto = require("node:crypto")
+const { saveUser } = require('./2userMongo')
 
-const userRouter = express.Router();
+passport.use(new LocalStrategy(
+  function (username, password, cb) {
+    const user = { username, password }
+    return cb(null, user)
+  }
+))
 
-userRouter.get("/signup", signupGet);
+function signupGet(req, res, next) {
+  res.render("signup");
+}
 
-userRouter.post("/signup", signupPost);
+async function signupPost(req, res, next) {
+  const user = req.body
+  await saveUser(user)
+  req.login(user)
+}
 
-userRouter.get("/login", loginGet);
+function loginGet(req, res, next) {
+  res.render("login");
+}
 
-userRouter.post("/login", loginPost)
+function loginPost(req,res,next) {
+  
+}
 
-module.exports = userRouter;
+module.exports = {
+  signupGet,
+  signupPost,
+  loginGet,
+  loginPost
+}

@@ -15,9 +15,12 @@ function signupGet(req, res, next) {
 }
 
 async function signupPost(req, res, next) {
+  console.log("req.bodyInSignupPost=>",req.body);
   const user = req.body
   await saveUser(user)
-  req.login(user)
+  req.login(user,function (err) {
+    if (err) console.log("req.login=>",err);
+  })
 }
 
 function loginGet(req, res, next) {

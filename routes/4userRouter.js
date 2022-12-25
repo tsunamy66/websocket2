@@ -1,5 +1,5 @@
 const express = require("express");
-const { signupGet, signupPost, loginGet, loginPost } = require('./3userRouter');
+const { signupGet, signupPost, loginGet, loginPost } = require('./3userController');
 
 const userRouter = express.Router();
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
-  email: {
+  username: {
     type: String,
     required: true
   },
@@ -30,6 +30,7 @@ userSchema.pre('save', function (next) {
         console.log(err);
       }
       user.password = derivedKey
+      console.log("userInpbkdf=>",user);
     })
   }
   next();

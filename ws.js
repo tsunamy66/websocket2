@@ -4,7 +4,7 @@ const app = require("./app");
 
 const server = http.createServer(app);
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server ,path:'/chat'});
 
 wss.on("connection", function connection(ws) {
   ws.on("message", function message(message) {

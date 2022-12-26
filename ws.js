@@ -1,6 +1,10 @@
 const { WebSocketServer } = require("ws");
+require("dotenv").config()
 const http = require('http')
 const app = require("./app");
+const mongoConnect = require("./services/mongo");
+
+const MONGO_URI = process.env.MONGO_URI
 
 const server = http.createServer(app);
 
@@ -19,10 +23,14 @@ wss.on("connection", function connection(ws) {
     console.log("SERVER SIDE::", message.toString());
   });
   ws.send("Hello World!!");
+  console.log("websocket server is running ");
 });
 
-server.listen(app.get("PORT"), () => {
-  console.log(`server is listening on port ${app.get("PORT")}`);
-});
+async function start() {
+  server.listen(app.get("PORT"), () => {
+    console.log(`server is listening on port ${app.get("PORT")}`);
+  });
+  await mongoConnect(MONGO_URI)
+}
 
-console.log("websocket server is running ");
+start();

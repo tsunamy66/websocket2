@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -24,13 +25,14 @@ userSchema.pre('save', function (next) {
   const user = this;
   if (user.isModified("password") || user.isNew) {
     const salt = crypto.randomUUID().toString();
+    logger({salt});
     user.salt = salt;
     crypto.pbkdf2(user.password, salt, 1000, 64, "sha256", function (err, derivedKey) {
       if (err) {
-        console.log(err);
+        logger({err});
       }
       user.password = derivedKey
-      console.log("userInpbkdf=>",user);
+      logger({user});
     })
   }
   next();

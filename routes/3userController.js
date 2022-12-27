@@ -2,6 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const crypto = require("node:crypto")
 const { saveUser } = require('./2userMongo')
+const logger = require('../utils/logger')
 
 passport.use(new LocalStrategy(
   function (username, password, cb) {
@@ -18,9 +19,9 @@ async function signupPost(req, res, next) {
   console.log("req.bodyInSignupPost=>",req.body);
   const user = req.body
   await saveUser(user)
-  req.login(user,function (err) {
-    if (err) console.log("req.login=>",err);
-  })
+  // req.login(user,function (err) {
+  //   if (err) logger({err});
+  // })
 }
 
 function loginGet(req, res, next) {

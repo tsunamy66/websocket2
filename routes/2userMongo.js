@@ -1,10 +1,11 @@
+const logger = require("../utils/logger");
 const User = require("./1userSchema")
 
-async function saveUser(user ) {
-  Object.assign(user,{
+async function saveUser(user) {
+  Object.assign(user, {
     salt: "salt"
   })
-  console.log("inSaveUser=>",user);
+  logger({user});
   await User.create(user)
 }
 

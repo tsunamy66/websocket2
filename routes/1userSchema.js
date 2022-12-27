@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', function (next) {
   const user = this;
   if (user.isModified("password") || user.isNew) {
-    const salt = crypto.getRandomValues(16).toString();
+    const salt = crypto.randomUUID().toString();
     user.salt = salt;
     crypto.pbkdf2(user.password, salt, 1000, 64, "sha256", function (err, derivedKey) {
       if (err) {

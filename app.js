@@ -26,7 +26,7 @@ app.get("/chat", function (req, res, next) {
 });
 
 app.use((req, res, next) => {
-  next(errorHandler(404))
+  next(errorHandler(404))  // next(new Error("404"))
 })
 
 app.use((err, req, res, next) => {

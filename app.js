@@ -2,8 +2,11 @@ const errorHandler = require("http-errors")
 const path = require("path");
 const express = require("express");
 const session = require('express-session');
+const cookieParser = require("cookie-parser")
 
 const userRouter = require("./routes/4userRouter");
+const { reqLoger } = require("./utils/logger");
+const passport = require("passport");
 
 const app = express();
 
@@ -11,9 +14,20 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.set("PORT", process.env.PORT || 8080);
 
+app.use(cookieParser())
 app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
+
+app.use(reqLoger,session({
+  secret: "sakethereiswebsocket",
+  resave: false,
+  saveUninitialized:false,
+  cookie:{maxAge: 60 * 5 * 1000}
+}),reqLoger) 
+
+//define req.login & req.logout & ...
+app.use(passport.session(),reqLoger) //in req.login
 
 app.use('/user', userRouter)
 

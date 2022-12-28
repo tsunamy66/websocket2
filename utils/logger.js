@@ -15,4 +15,13 @@ function getVarName(varObj) {
   return Object.keys(varObj)[0]
 }
 
-module.exports = logger
+function reqLoger(req,res,next) {
+  console.log("req.sessionID|>", req.sessionID);
+  console.log("req.path|>", req.path);
+  console.log("req.user     |>", req.user);
+  console.log("req.session  |>", req.session);
+  console.log("req.cookies  |>", req.cookies);
+  next()
+}
+
+module.exports = {logger,reqLoger}

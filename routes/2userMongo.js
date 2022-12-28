@@ -1,11 +1,13 @@
-const logger = require("../utils/logger");
+const { logger } = require("../utils/logger");
+const crypto = require("crypto")
 const User = require("./1userSchema")
 
 async function saveUser(user) {
   Object.assign(user, {
-    salt: "salt"
+    salt: crypto.randomUUID(),
+    id: crypto.randomBytes(12).toString("hex"),
   })
-  logger({user});
+
   await User.create(user)
 }
 

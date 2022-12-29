@@ -1,9 +1,17 @@
 const express = require("express");
 const { signupGet, signupPost, loginGet, loginPost } = require('./3userController');
 
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated() && !!req.user) {
+    next();
+  } else {
+    res.redirect("/user/login");
+  }
+}
+
 const userRouter = express.Router();
 
-userRouter.get("/signup", signupGet);
+userRouter.get("/signup", isLoggedIn, signupGet);
 
 userRouter.post("/signup", signupPost);
 

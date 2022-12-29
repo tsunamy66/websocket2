@@ -11,5 +11,5 @@ function bar() {
   logger({y})
 }
 
-foo()
-bar()
+// foo()
+// bar()

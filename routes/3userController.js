@@ -1,7 +1,7 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const crypto = require("node:crypto")
-const { saveUser } = require('./2userMongo')
+const { saveUser, findUserById } = require('./2userMongo')
 const { logger } = require('../utils/logger')
 
 // passport.use(new LocalStrategy(
@@ -13,15 +13,17 @@ const { logger } = require('../utils/logger')
 
 //initialize req.session.passport 
 passport.serializeUser(function (user, done) {
-  console.log("serialize|>",user);
+  console.log("serialize|>", user);
   done(null, user.id)
   //Done & returns to req.login while signing up
+  //درواقع انجام میشه و برمیگرده به ادامه کار در رک.لاگین موقع ثبت نام
 })
 
-//Get req.session.passport from serialize & save in req.user
-passport.deserializeUser(function (id,done) {
-  console.log("desrialize|>",id)
-  done(null,id)
+//Get req.session.passport & save in req.user
+passport.deserializeUser(async function (id, done) {
+  const user = await findUserById(id)
+  console.log("desrialize|>", user)
+  done(null, { username: user.username })
 })
 
 function signupGet(req, res, next) {
@@ -30,14 +32,15 @@ function signupGet(req, res, next) {
 
 async function signupPost(req, res, next) {
   // console.log("req.bodyInSignupPost=>",req.body);
-  const user = req.body
-  await saveUser(user)
-  console.log("signupUser|>",user);
+  const user = req.body;
+  await saveUser(user);
+  console.log("signupUser|>", req.isAuthenticated());
 
-  //send user to serializeUser
+  //pass user to serializeUser
   req.login(user, function (err) {
     if (err) { return next(err); };
     console.log("befor res.redirect to chatttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
+    console.log("signupUser|>", req.isAuthenticated());
     res.redirect("/chat")
   })
 }

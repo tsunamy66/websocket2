@@ -11,6 +11,11 @@ async function saveUser(user) {
   await User.create(user)
 }
 
+async function findUserById(id) {
+  return await User.findOne({id})
+}
+
 module.exports = {
-  saveUser
+  saveUser,
+  findUserById
 }

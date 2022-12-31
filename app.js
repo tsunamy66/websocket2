@@ -4,7 +4,7 @@ const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser")
 
-const userRouter = require("./routes/4userRouter");
+const { userRouter, isLoggedIn } = require("./routes/user/4userRouter");
 const { reqLoger } = require("./utils/logger");
 const passport = require("passport");
 
@@ -19,24 +19,24 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(reqLoger,session({
+app.use(session({
   secret: "sakethereiswebsocket",
   resave: false,
-  saveUninitialized:false,
-  cookie:{maxAge: 60 * 5 * 1000}
-}),reqLoger) 
+  saveUninitialized: false,
+  cookie: { maxAge: 60 * 5 * 1000 }
+}))
 
 //define req.login & req.logout & ...
-app.use(passport.session(),reqLoger) //in req.login
+app.use(passport.session()) //in req.login
 
 app.use('/user', userRouter)
 
-app.get("/home", function (req, res, next) {
-  res.render("home");
+app.get("/chat",isLoggedIn, function (req, res, next) {
+  res.render("chat")
 });
 
-app.get("/chat", function (req, res, next) {
-  res.render("chat")
+app.get("/home", function (req, res, next) {
+  res.render("home");
 });
 
 app.use((req, res, next) => {

@@ -21,7 +21,7 @@ userRouter.get("/login", loginGet);
 //passport.authenticate() middleware invokes req.login() automatically.
 userRouter.post("/login", passport.authenticate("local", {
   successReturnToOrRedirect: "/chat",
-  failureRedirect: "/login",
+  failureRedirect: "/user/login",
   failureMessage: true,
 }))
 

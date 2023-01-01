@@ -104,3 +104,9 @@ p.help {
 	background-repeat: no-repeat;
 	background-position: center left;
 }
+
+p {
+	color: #d83f45;
+	text-align: center;
+	font-style: italic;
+}

@@ -4,14 +4,18 @@ const { saveUser, findUserById, findUserByUsername } = require('./2userMongo')
 const bcrypt = require("bcryptjs")
 const { logger } = require('../../utils/logger')
 
-passport.use(new LocalStrategy(//{passReqToCallback : true},//To access req
-  async function (username, password, done) {
+passport.use(new LocalStrategy({ passReqToCallback: true },//To access req
+  async function (req, username, password, done) {
     const user = await findUserByUsername(username)
     console.log("user|>", user);
-    if (!user) { done(null, { error: "incorrect Username" }) }
+    req.session.messages = []
+    if (!user) {
+      console.log({ user });
+      return done(null, false, { message: "Incorrect username" });
+    }
     bcrypt.compare(password, user.password, function (err) {
-      if (err) { done(null, err) };
-      done(null,user)
+      if (err) { return done(null, false, "Incorrect password") };
+      done(null, user)
     })
   }
 ))
@@ -52,11 +56,20 @@ async function signupPost(req, res, next) {
 }
 
 function loginGet(req, res, next) {
-  res.render("login");
+  console.log("req.session|>", req.session);
+  if (req.session.messages) {
+    res.render("login", {
+      faiLogin: req.session.messages[0]
+    });
+  } else {
+    res.render("login", {
+      faiLogin: ""
+    })
+  }
 }
 
-function signoutGet(req,res,next) {
-  req.logout(function(err) {
+function signoutGet(req, res, next) {
+  req.logout(function (err) {
     if (err) { return next(err); }
     res.redirect('/home');
   });

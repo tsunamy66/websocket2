@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Chat Application</title>
+        <meta name="description" content="Tuts+ Chat Application" />
+        <!-- <link rel="stylesheet" href="/css/style.css" /> -->
+        <link rel="stylesheet" href="/css/chat.css">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket</title>
-</head>
-
-<body>
-    <h1>WebSock</h1>
-    <h2></h2>
-    <div class="messages"></div>
-     <form action="javascript:void(0)">
-        <label for="message">&gt;</label>
-        <input type="text" id="message" required autofocus>
-    </form>
-    <script src="/ws-client.js"></script> 
-</body>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="menu">
+                <p class="welcome">Welcome to messenger<b></b></p>
+                <p class="logout"><a id="exit" href="#">Exit Chat</a></p>
+            </div>
+            <div id="chatbox"></div>
+            <form id="messages" action="javascript:void(0)">
+                <input name="usermsg" type="text" id="usermsg" />
+                <input name="submitmsg" type="submit" id="submitmsg" value="Send"/>
+            </form>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="/wsclient"></script>
+    </body>
 </html>

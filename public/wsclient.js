@@ -26,8 +26,8 @@ ws.onmessage = function(payload) {
 // ws.addEventListener('message',(payload)=>{
 //     printMessage(payload.data)
 // })
-document.forms[0].onsubmit = function() {
-    var input = document.getElementById("message");
+document.forms["messages"].onsubmit = function() {
+    var input = document.getElementById("usermsg");
     // console.log(input.value);
     ws.send(input.value )
     // printMessage(input.value)
@@ -43,3 +43,10 @@ function printMessage(message) {
     document.querySelector('h2').innerHTML = message
 }
 
+script.onerror = function() {
+    alert("cannot load script");
+ }
+
+ script.onload = function() {
+    alert('loaded');
+}

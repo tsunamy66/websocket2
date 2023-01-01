@@ -39,7 +39,11 @@ app.get("/home", function (req, res, next) {
   res.render("home");
 });
 
-app.use((req, res, next) => {
+app.get("*",(req, res, next) => {
+  console.log("/*|>",req.path);
+  if (req.path == "/wsclient" || req.path == "/favicon.ico") {
+    return next()
+  }
   next(errorHandler(404))  // next(new Error("404"))
 })
 

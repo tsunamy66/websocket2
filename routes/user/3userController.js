@@ -35,14 +35,26 @@ passport.deserializeUser(async function (id, done) {
 })
 
 function signupGet(req, res, next) {
-  res.render("signup");
+  console.log(req.session);
+  res.render("signup",{
+    failSignup : req.session.signupMessage || ""
+  });
+  delete req.session.signupMessage
+  req.session.save()
+  console.log("req.session|>",req.session);
 }
 
 async function signupPost(req, res, next) {
-  // console.log("req.bodyInSignupPost=>",req.body);
   let user = req.body;
 
   console.log("signupPost0|>", user);
+  const existUser = await findUserByUsername(user.username)
+  if (existUser) {
+    req.session.signupMessage = "Username Already Exist"
+    console.log({existUser});
+    return res.redirect("/user/signup")
+  }
+
   user = await saveUser(user);
   console.log("signupPost|>", user);
   //pass user to serializeUser
@@ -50,7 +62,6 @@ async function signupPost(req, res, next) {
   req.login(user, function (err) {
     if (err) { return next(err); };
     console.log("befor res.redirect to chatttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
-    // console.log("signupUser|>", req.isAuthenticated());
     res.redirect("/chat")
   })
 }
@@ -66,9 +77,11 @@ function loginGet(req, res, next) {
       faiLogin: ""
     })
   }
+  delete req.session.messages
+  req.session.save()
 }
 
-function signoutGet(req, res, next) {
+function logoutGet(req, res, next) {
   req.logout(function (err) {
     if (err) { return next(err); }
     res.redirect('/home');
@@ -79,5 +92,5 @@ module.exports = {
   signupGet,
   signupPost,
   loginGet,
-  signoutGet,
+  logoutGet,
 }

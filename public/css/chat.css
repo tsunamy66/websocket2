@@ -63,12 +63,29 @@ a:hover {
   margin-bottom: 25px;
   padding: 10px;
   background: #fff;
-  height: 300px;
+  height: 600px;
   /* width: 530px; */
   border: 1px solid #a7a7a7;
   overflow: auto;
   border-radius: 4px;
   border-bottom: 4px solid #a7a7a7;
+  display: flex;
+}
+
+#chatbox p.msg {
+  color: rgb(0, 70, 117);
+  border-radius: 20px;
+  background-color: #ebe9e9;
+  /* justify-content: center; */
+  position: relative;
+  top: 90%;
+  left: 0px;
+  padding: 1%;
+  height: 2.5%; 
+  /* background-position: center;
+  background-repeat: no-repeat; */
+  /* background-size: 100px  60px; */
+  /* border: 2px inset #08db3d; */
 }
 
 #usermsg {
@@ -108,7 +125,7 @@ a:hover {
 }
 
 a#exit {
-  color: white;
+  color: rgb(233, 230, 230);
   background: #c62828;
   padding: 4px 8px;
   border-radius: 4px;

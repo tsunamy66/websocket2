@@ -7,19 +7,19 @@ const ws = new WebSocket(HOST)
 
 ws.onopen = function(){
     // ws.send('i am connected')
-    setTiltle('connected to Cyber Chat')
+    setTiltle('connected')
 }
 ws.onclose = function(){
-    setTiltle('disconnected from Cyber Chat')
+    setTiltle('disconnected')
 }
 ws.onmessage = function(payload) {
-    console.log('window.location.origin;;',location.origin);
-    console.log('window.location.hostname;;',location.hostname);
-    console.log('window.location.pathname;;',location.pathname);
-    console.log('window.location.protocol;;',location.protocol);
-    console.log('window.location.port;;',location.port);
-    console.log('window.history;;',window.history);
-    console.log('document.cookie;;',document.cookie);
+    // console.log('window.location.origin;;',location.origin);
+    // console.log('window.location.hostname;;',location.hostname);
+    // console.log('window.location.pathname;;',location.pathname);
+    // console.log('window.location.protocol;;',location.protocol);
+    // console.log('window.location.port;;',location.port);
+    // console.log('window.history;;',window.history);
+    // console.log('document.cookie;;',document.cookie);
     console.log('navigator.userAgent;;',navigator.userAgent);
     printMessage(payload.data)
 }
@@ -27,26 +27,20 @@ ws.onmessage = function(payload) {
 //     printMessage(payload.data)
 // })
 document.forms["messages"].onsubmit = function() {
+    const username = document.getElementById("username").textContent
+    console.log({username});
+    console.log("input.value");
     var input = document.getElementById("usermsg");
-    // console.log(input.value);
-    ws.send(input.value )
+    ws.send(input.value)
     // printMessage(input.value)
     input.value = "";
 }
 
 function setTiltle(title){
-    document.querySelector('h1').innerHTML = title
+    document.querySelector('h4').innerHTML = title
 }
 
 function printMessage(message) {
-    console.log(message);
-    document.querySelector('h2').innerHTML = message
-}
-
-script.onerror = function() {
-    alert("cannot load script");
- }
-
- script.onload = function() {
-    alert('loaded');
+    console.log("printMessage|>",message);
+    document.querySelector('p.msg').innerHTML = message
 }

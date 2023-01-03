@@ -3,6 +3,12 @@ const path = require("path");
 const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser")
+const sess = session({
+  secret: "sakethereiswebsocket",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 60 * 5 * 1000 }
+})
 
 const { userRouter, isLoggedIn } = require("./routes/user/4userRouter");
 const { reqLoger } = require("./utils/logger");
@@ -19,12 +25,25 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
+app.use(function (req,res,next) {
+  // console.log("req.cookies(bfrSes)|>",req.cookies);
+  // console.log("req.signedCookies(bfrSes)|>",req.signedCookies);
+  next()
+},session({
   secret: "sakethereiswebsocket",
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 60 * 5 * 1000 }
-}))
+}),function (req,res,next) {
+  // console.log("req.signedCookies(aftrSess)|>",req.signedCookies);
+  // console.log("req.session(aftrSess)|>",req.session);
+  // console.log("req.originalUrl(aftrSess)|>",req.originalUrl);
+  // console.log("req.baseUrl(aftrSess)|>",req.baseUrl);
+  // console.log("req.url(aftrSess)|>",req.url);
+  // console.log("req.headers.location(aftrSess)|>",req.headers.location);
+  // console.log("req.referer(aftrSess)|>",req.headers.referer);
+  next()
+})
 
 //define req.login & req.logout & ...
 app.use(passport.session()) //in req.login
@@ -32,10 +51,13 @@ app.use(passport.session()) //in req.login
 app.use('/user', userRouter)
 
 app.get("/chat",isLoggedIn, function (req, res, next) {
-  res.render("chat")
+  res.render("chat",{
+    username : req.user.username
+  })
 });
 
 app.get("/home", function (req, res, next) {
+  console.log("req.session(home)|>",req.session);
   res.render("home");
 });
 
@@ -58,4 +80,7 @@ app.use((err, req, res, next) => {
 })
 
 
-module.exports = app;
+module.exports = {
+  app,
+  sess
+};

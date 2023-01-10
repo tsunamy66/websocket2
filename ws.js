@@ -11,6 +11,8 @@ const server = http.createServer(app);
 
 const wss = new WebSocketServer({ noServer: true, path: '/chat', clientTracking: false });
 
+const clients = new Set()
+
 server.on("upgrade", function (req, socket, head) {
   var pathname = require('url').parse(req.url).pathname;
   console.log("req.path{upgrd}", req.path);
@@ -42,6 +44,8 @@ server.on("upgrade", function (req, socket, head) {
 })
 
 wss.on("connection", function connection(ws, req, clntName) {
+  clients.add(ws)
+  console.log("clients|>", clients);
   console.log("clntName|>", clntName);
   ws.on("message", function message(message) {
     // console.log("req.cookies1|>",req.cookies);
@@ -49,9 +53,7 @@ wss.on("connection", function connection(ws, req, clntName) {
     //   ws.close();
     // } else {
     console.log(`Received message ${message} from user ${clntName}`);
-    console.log("wss.clients.size()|>", wss.clients.size);
-    wss.clients.forEach(function (client) {
-      console.log("client.userId|>", client.userId);
+    clients.forEach(function (client) {
       client.send(message.toString());
     });
 

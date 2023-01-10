@@ -1,10 +1,10 @@
 const { WebSocketServer } = require("ws");
 require("dotenv").config()
 const http = require('http')
-const { app, sess } = require("./app");
+const { app, sessionParser } = require("./app");
 const mongoConnect = require("./services/mongo");
+const { findUserById } = require("./routes/user/2userMongo");
 
-const cookieParser = require("cookie-parser")
 const MONGO_URI = process.env.MONGO_URI
 
 const server = http.createServer(app);
@@ -12,57 +12,52 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true, path: '/chat', clientTracking: false });
 
 server.on("upgrade", function (req, socket, head) {
-  console.log("req.url",req.url);
-  console.log("req.path",req.path);
-  console.log("req.headers",req.headers);
-  sess(req, {}, function (sess) {
+  var pathname = require('url').parse(req.url).pathname;
+  console.log("req.path{upgrd}", req.path);
+  console.log("req.headers{upgrd}", req.headers);
+  sessionParser(req, {}, async function () {
     // if (!req.session.userId) {
     //   socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
     //   socket.destroy();
     //   return;
     // }
-    console.log("sess|>", sess);
-    console.log("req.session|>", req.session);
-    console.log("req.url|>",req.url);
-    // return
+    console.log("req.session{upgrdSess}|>", req.session);
+    console.log("req.url{upgrdSess}|>", req.url);
+
+    let clntUser
+    try {
+      clntUser = await findUserById(req.session.passport.user)
+      console.log("clntUser|>", clntUser);
+    } catch (error) {
+      console.log("error findUserById in uograde listener");
+      socket.destroy(error);
+      return
+    }
+
+    const clntName = clntUser.username
     wss.handleUpgrade(req, socket, head, function (ws) {
-      wss.emit('connection', ws, req);
+      wss.emit('connection', ws, req, clntName);
     });
   })
-  console.log("req.session1|>", req.session);
-  // sessionParser(req, {}, () => {
-  //   if (!req.session.userId) {
-  //     socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-  //     socket.destroy();
-  //     return;
-  //   }
 })
 
-wss.on("connection", function connection(ws, req, clname) {
-  // cookieParser()(req,{},function (params) {
-  //   console.log("cookie parsed!!");
-  // })
-  // console.log("req.headers(ws)|>",req.headers);
-  // console.log("req.cookies(ws)|>",req.cookies);
-  // sess(req, {}, function (sess) {
-  //   console.log("sess|>", sess);
-  //   console.log("req.session|>", req.session);
-  //   return
-  // })
-  // console.log("req.cookies|>",req.cookies);
+wss.on("connection", function connection(ws, req, clntName) {
+  console.log("clntName|>", clntName);
   ws.on("message", function message(message) {
     // console.log("req.cookies1|>",req.cookies);
     // if (message.toString() === "exit") {
     //   ws.close();
     // } else {
-    console.log(`Received message ${message} from user ${clname}`);
-    ws.send(message.toString())
-    // wss.clients.forEach(function (client) {
-    //   client.send(message.toString());
-    // });
-    // }
+    console.log(`Received message ${message} from user ${clntName}`);
+    console.log("wss.clients.size()|>", wss.clients.size);
+    wss.clients.forEach(function (client) {
+      console.log("client.userId|>", client.userId);
+      client.send(message.toString());
+    });
+
     console.log("SERVER SIDE::", message.toString());
   });
+
   ws.send("Hello");
   console.log("websocket server is running ");
 });

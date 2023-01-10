@@ -42,9 +42,10 @@ function (req,res,next) {
 })
 
 //define req.login & req.logout & ...
-//کاربری که ثبت نام شده باشه یعنی پاسپورت در سشن توسط اکسپرس-سشن ضمیمه شده باشه پاسپورت.سشن آنرا به دیسریالایز میفرستد
+//کاربری که ثبت نام شده باشه یعنی پاسپورت در رک.سشن توسط اکسپرس-سشن ضمیمه شده باشه پاسپورت.سشن آنرا به دیسریالایز میفرستد
 app.use(function (req,res,next) {
-  console.log("req.user bfr passport.session",req.user);
+  console.log("req.session bfr passport.sess|>",req.session);
+  console.log("req.user bfr passport.sess|>",req.user);
   next()
 },passport.session(),function (req,res,next) {
   console.log("req.user aftr passport.session",req.user);

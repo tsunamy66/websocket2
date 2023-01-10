@@ -20,6 +20,7 @@ ws.onmessage = function(payload) {
     // console.log('window.location.port;;',location.port);
     // console.log('window.history;;',window.history);
     // console.log('document.cookie;;',document.cookie);
+    console.log('payload.data|>',payload.data);
     console.log('navigator.userAgent;;',navigator.userAgent);
     printMessage(payload.data)
 }
@@ -42,5 +43,8 @@ function setTiltle(title){
 
 function printMessage(message) {
     console.log("printMessage|>",message);
-    document.querySelector('p.msg').innerHTML = message
+    // document.querySelector('p.msg').innerHTML = message
+    var p = document.createElement('p')
+    p.innerText = message
+    document.querySelector('div.messages').appendChild(p)
 }

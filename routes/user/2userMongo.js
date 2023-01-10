@@ -16,7 +16,7 @@ async function saveUser(user) {
 }
 
 async function findUserById(id) {
-  return await User.findById(id)
+  return await User.findById(id, { _id: 0, __v: 0 })
 }
 
 async function findUserByUsername(username) {

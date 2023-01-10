@@ -3,13 +3,6 @@ const path = require("path");
 const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser")
-const sess = session({
-  secret: "sakethereiswebsocket",
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 60 * 5 * 1000 }
-})
-
 const { userRouter, isLoggedIn } = require("./routes/user/4userRouter");
 const { reqLoger } = require("./utils/logger");
 const passport = require("passport");
@@ -25,16 +18,19 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(function (req,res,next) {
-  // console.log("req.cookies(bfrSes)|>",req.cookies);
-  // console.log("req.signedCookies(bfrSes)|>",req.signedCookies);
-  next()
-},session({
+const sessionParser = session({
   secret: "sakethereiswebsocket",
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 60 * 5 * 1000 }
-}),function (req,res,next) {
+});
+
+app.use(function (req,res,next) {
+  // console.log("req.cookies(bfrSes)|>",req.cookies);
+  // console.log("req.signedCookies(bfrSes)|>",req.signedCookies);
+  next()
+},sessionParser,
+function (req,res,next) {
   // console.log("req.signedCookies(aftrSess)|>",req.signedCookies);
   // console.log("req.session(aftrSess)|>",req.session);
   // console.log("req.originalUrl(aftrSess)|>",req.originalUrl);
@@ -46,7 +42,14 @@ app.use(function (req,res,next) {
 })
 
 //define req.login & req.logout & ...
-app.use(passport.session()) //in req.login
+//کاربری که ثبت نام شده باشه یعنی پاسپورت در سشن توسط اکسپرس-سشن ضمیمه شده باشه پاسپورت.سشن آنرا به دیسریالایز میفرستد
+app.use(function (req,res,next) {
+  console.log("req.user bfr passport.session",req.user);
+  next()
+},passport.session(),function (req,res,next) {
+  console.log("req.user aftr passport.session",req.user);
+  next()
+}) //in req.login
 
 app.use('/user', userRouter)
 
@@ -82,5 +85,5 @@ app.use((err, req, res, next) => {
 
 module.exports = {
   app,
-  sess
+  sessionParser
 };

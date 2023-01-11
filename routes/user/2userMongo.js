@@ -5,7 +5,7 @@ const User = require("./1userSchema")
 function genPasSaltId(password) {
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
-  return { password : hash };
+  return { password: hash };
 }
 
 async function saveUser(user) {
@@ -16,7 +16,8 @@ async function saveUser(user) {
 }
 
 async function findUserById(id) {
-  return await User.findById(id, { _id: 0, __v: 0 })
+  return await User.findById(id, { username: 1, _id: 0 })
+  //In the above syntax "username":1, _id:0 means get all data from username field without _id.
 }
 
 async function findUserByUsername(username) {

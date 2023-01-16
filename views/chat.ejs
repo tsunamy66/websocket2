@@ -11,18 +11,23 @@
     <body>
         <h4 style="text-align: center;" > </h4>
         <div id="wrapper">
+
             <div id="menu">
                 <p class="welcome">Welcome to messenger <b id="username"><%= username %></b> </p>
                 <p class="logout"><a id="exit" href="/user/logout">Exit Chat</a></p>
             </div>
-            <div id="chatbox">
-                <p class="msg"></p>
-                <div class="messages"></div>
+
+            <div id="chatbox" class="chatbox">
+                <!-- <p class="msg"></p> -->
+                <div id="messages" class="messages"></div>
             </div>
-            <form id="messages" action="javascript:void(0)">
-                <input name="usermsg" type="text" id="usermsg" />
-                <input name="submitmsg" type="submit" id="submitmsg" value="Send" />
+
+            <form id="message" action="javascript:void(0)" >
+                <input name="usermsg" type="text" id="usermsg" placeholder=" Message..." />
+                <button name="submitmsg" id="submitmsg" type="submit">Send</button>
+                <!-- <input name="submitmsg" type="submit" id="submitmsg" value="Send" /> -->
             </form>
+
         </div>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="/wsclient.js"></script>

@@ -1,6 +1,7 @@
 const { WebSocketServer } = require("ws");
-require("dotenv").config()
-const http = require('http')
+const websocket = require("ws");
+require("dotenv").config();
+const http = require('http');
 const { app, sessionParser } = require("./app");
 const mongoConnect = require("./services/mongo");
 const { findUserById } = require("./routes/user/2userMongo");
@@ -18,43 +19,53 @@ server.on("upgrade", function (req, socket, head) {
   console.log("req.path{upgrd}", req.path);
   console.log("req.headers{upgrd}", req.headers);
   sessionParser(req, {}, async function () {
-    // if (!req.session.userId) {
-    //   socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-    //   socket.destroy();
-    //   return;
-    // }
+
+    if (!req.session?.passport) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
     console.log("req.session{upgrdSess}|>", req.session);
     console.log("req.url{upgrdSess}|>", req.url);
 
-    let clntUser
+    let clientUser
+    const id = req.session.passport.user
     try {
-      clntUser = await findUserById(req.session.passport.user)
-      console.log("clntUser|>", clntUser);
+      clientUser = await findUserById(id)
+      console.log("clntUser|>", clientUser);
     } catch (error) {
       console.log("error findUserById in uograde listener");
       socket.destroy(error);
       return
     }
 
-    const clntName = clntUser.username
+    const clientName = clientUser.username
     wss.handleUpgrade(req, socket, head, function (ws) {
-      wss.emit('connection', ws, req, clntName);
+      console.log("ws.user|>",ws.user);
+      Object.assign(ws,{
+        user : {
+          username : clientName,
+          id
+        }
+      })
+      clients.add(ws);
+      wss.emit('connection', ws, req, ws.user.username);
     });
-  })
-})
+  });
+});
 
-wss.on("connection", function connection(ws, req, clntName) {
-  clients.add(ws)
-  console.log("clients|>", clients);
-  console.log("clntName|>", clntName);
+wss.on("connection", function connection(ws, req, username) {
+  console.log("websocket.OPEN|>",websocket.OPEN);
+  console.log("clntName|>", username);
   ws.on("message", function message(message) {
-    // console.log("req.cookies1|>",req.cookies);
-    // if (message.toString() === "exit") {
-    //   ws.close();
-    // } else {
-    console.log(`Received message ${message} from user ${clntName}`);
+
+    console.log(`Received message ${message} from user ${username}`);
     clients.forEach(function (client) {
-      client.send(message.toString());
+      // console.log("client.username|>",client.user.username);
+      if (client.readyState === websocket.OPEN) {
+        client.send(message.toString());
+      };
     });
 
     console.log("SERVER SIDE::", message.toString());

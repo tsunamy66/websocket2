@@ -48,7 +48,7 @@ function printMessage(message) {
     // console.log("printMessage|>",message);
     // document.querySelector('p.msg').innerHTML = message;
     var p = document.createElement('p');
-    p.setAttribute("class", "msg");
+    p.setAttribute("class", "badge rounded-pill bg-secondary");
     p.innerText = message;
     const divChatBox = document.querySelector('div.chatbox');
     divChatBox.appendChild(p)

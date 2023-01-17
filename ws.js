@@ -1,5 +1,5 @@
 const { WebSocketServer } = require("ws");
-const websocket = require("ws");
+const WebSocket = require("ws");
 require("dotenv").config();
 const http = require('http');
 const { app, sessionParser } = require("./app");
@@ -16,7 +16,7 @@ const clients = new Set()
 
 server.on("upgrade", function (req, socket, head) {
   var pathname = require('url').parse(req.url).pathname;
-  console.log("req.path{upgrd}", req.path);
+  console.log("req.path{upgrd}", pathname);
   console.log("req.headers{upgrd}", req.headers);
   sessionParser(req, {}, async function () {
 
@@ -42,13 +42,21 @@ server.on("upgrade", function (req, socket, head) {
 
     const clientName = clientUser.username
     wss.handleUpgrade(req, socket, head, function (ws) {
-      console.log("ws.user|>",ws.user);
-      Object.assign(ws,{
-        user : {
-          username : clientName,
+      Object.assign(ws, {
+        user: {
+          username: clientName,
           id
         }
       })
+ 
+      console.log("ws.user|>", ws.user);
+      
+      clients.forEach(function iamonline(client) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.emit("online",ws.user.username)
+        }
+      })
+
       clients.add(ws);
       wss.emit('connection', ws, req, ws.user.username);
     });
@@ -56,14 +64,14 @@ server.on("upgrade", function (req, socket, head) {
 });
 
 wss.on("connection", function connection(ws, req, username) {
-  console.log("websocket.OPEN|>",websocket.OPEN);
+  console.log("websocket.OPEN|>", WebSocket.OPEN);
   console.log("clntName|>", username);
   ws.on("message", function message(message) {
 
     console.log(`Received message ${message} from user ${username}`);
     clients.forEach(function (client) {
       // console.log("client.username|>",client.user.username);
-      if (client.readyState === websocket.OPEN) {
+      if (client.readyState === WebSocket.OPEN) {
         client.send(message.toString());
       };
     });
@@ -71,8 +79,8 @@ wss.on("connection", function connection(ws, req, username) {
     console.log("SERVER SIDE::", message.toString());
   });
 
-  ws.send("Hello");
-  console.log("websocket server is running ");
+  ws.send("Hello"); //ws.emit("message","Hello")
+
 });
 
 async function start() {

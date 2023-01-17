@@ -15,8 +15,8 @@ form {
   gap: 10px;
   justify-content: center;
   background: #efefef;
-  position: fixed;
-  width: calc(100% - 89px);
+  position: relative;
+  /* width: calc(100% - 89px); */
   bottom: 0;
   border: solid 1px;
 }
@@ -67,17 +67,15 @@ a:hover {
 
 #chatbox {
   text-align: left;
-  margin: 0 auto;
-  margin-bottom: 25px;
+  margin: 0px;
   padding: 10px;
   background: #fff;
-  height: calc(100vh - 228px);
+  height: calc(100vh - 239px);
   overflow: auto;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: baseline;
-  margin-bottom: 100px;
 }
 
 #chatbox p.msg {
@@ -148,8 +146,10 @@ a:hover {
 }
 
 #menu {
-  padding: 15px 25px;
+  border-bottom: 1px solid black;
+  padding: 0px 15px;
   display: flex;
+  background: #efefef;
 }
 
 #menu p.welcome {

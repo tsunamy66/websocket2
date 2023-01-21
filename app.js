@@ -25,48 +25,48 @@ const sessionParser = session({
   cookie: { maxAge: 60 * 60 * 1000 }
 });
 
-app.use(function (req,res,next) {
+app.use(function (req, res, next) {
   // console.log("req.cookies(bfrSes)|>",req.cookies);
   // console.log("req.signedCookies(bfrSes)|>",req.signedCookies);
   next()
-},sessionParser,
-function (req,res,next) {
-  // console.log("req.signedCookies(aftrSess)|>",req.signedCookies);
-  // console.log("req.session(aftrSess)|>",req.session);
-  // console.log("req.originalUrl(aftrSess)|>",req.originalUrl);
-  // console.log("req.baseUrl(aftrSess)|>",req.baseUrl);
-  // console.log("req.url(aftrSess)|>",req.url);
-  // console.log("req.headers.location(aftrSess)|>",req.headers.location);
-  // console.log("req.referer(aftrSess)|>",req.headers.referer);
-  next()
-})
+}, sessionParser,
+  function (req, res, next) {
+    // console.log("req.signedCookies(aftrSess)|>",req.signedCookies);
+    // console.log("req.session(aftrSess)|>",req.session);
+    // console.log("req.originalUrl(aftrSess)|>",req.originalUrl);
+    // console.log("req.baseUrl(aftrSess)|>",req.baseUrl);
+    // console.log("req.url(aftrSess)|>",req.url);
+    // console.log("req.headers.location(aftrSess)|>",req.headers.location);
+    // console.log("req.referer(aftrSess)|>",req.headers.referer);
+    next()
+  })
 
 //define req.login & req.logout & ...
 //کاربری که ثبت نام شده باشه یعنی پاسپورت در رک.سشن توسط اکسپرس-سشن ضمیمه شده باشه پاسپورت.سشن آنرا به دیسریالایز میفرستد
-app.use(function (req,res,next) {
-  console.log("req.session bfr passport.sess|>",req.session);
-  console.log("req.user bfr passport.sess|>",req.user);
+app.use(function (req, res, next) {
+  // console.log("req.session bfr passport.sess|>",req.session);
+  // console.log("req.user bfr passport.sess|>",req.user);
   next()
-},passport.session(),function (req,res,next) {
-  console.log("req.user aftr passport.session",req.user);
+}, passport.session(), function (req, res, next) {
+  // console.log("req.user aftr passport.session",req.user);
   next()
 }) //in req.login
 
 app.use('/user', userRouter)
 
-app.get("/chat",isLoggedIn, function (req, res, next) {
-  res.render("chat",{
-    username : req.user.username
+app.get("/chat", isLoggedIn, function (req, res, next) {
+  res.render("chat", {
+    username: req.user.username
   })
 });
 
 app.get("/home", function (req, res, next) {
-  console.log("req.session(home)|>",req.session);
+  console.log("req.session(home)|>", req.session);
   res.render("home");
 });
 
-app.get("*",(req, res, next) => {
-  console.log("/*|>",req.path);
+app.get("*", (req, res, next) => {
+  console.log("/*|>", req.path);
   if (req.path == "/wsclient" || req.path == "/favicon.ico") {
     return next()
   }

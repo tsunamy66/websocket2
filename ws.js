@@ -26,8 +26,8 @@ server.on("upgrade", function (req, socket, head) {
       return;
     }
 
-    console.log("req.session{upgrdSess}|>", req.session);
-    console.log("req.url{upgrdSess}|>", req.url);
+    // console.log("req.session{upgrdSess}|>", req.session);
+    // console.log("req.url{upgrdSess}|>", req.url);
 
     let clientUser
     const id = req.session.passport.user
@@ -39,7 +39,7 @@ server.on("upgrade", function (req, socket, head) {
       socket.destroy(error);
       return
     }
-
+    
     const clientName = clientUser.username
     wss.handleUpgrade(req, socket, head, function (ws) {
       Object.assign(ws, {
@@ -48,12 +48,12 @@ server.on("upgrade", function (req, socket, head) {
           id
         }
       })
- 
+      
       console.log("ws.user|>", ws.user);
       
       clients.forEach(function iamonline(client) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.emit("online",ws.user.username)
+        if (client !== ws && client.readyState === WebSocket.OPEN && client != ws) {
+          client.send(JSON.stringify(ws.user))
         }
       })
 
@@ -64,22 +64,30 @@ server.on("upgrade", function (req, socket, head) {
 });
 
 wss.on("connection", function connection(ws, req, username) {
-  console.log("websocket.OPEN|>", WebSocket.OPEN);
-  console.log("clntName|>", username);
+  console.log(clients.size);
+  // console.log("websocket.OPEN|>", WebSocket.OPEN);
+  // console.log("clntName|>", username);
   ws.on("message", function message(message) {
 
     console.log(`Received message ${message} from user ${username}`);
+    console.log("message|>", message);
     clients.forEach(function (client) {
       // console.log("client.username|>",client.user.username);
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message.toString());
+      if (client.readyState === WebSocket.OPEN && ws != client) {
+        let messageUsernameId = JSON.stringify(client.user).concat(message.toString())
+        console.log(messageUsernameId);
+        client.send(messageUsernameId,{binary:true});
       };
     });
 
     console.log("SERVER SIDE::", message.toString());
   });
 
-  ws.send("Hello"); //ws.emit("message","Hello")
+  ws.send("Hello",{binary:true}); //ws.emit("message","Hello")
+
+  ws.on("close", function close() {
+    clients.delete(ws)
+  })
 
 });
 

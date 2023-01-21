@@ -1,7 +1,7 @@
-* {box-sizing: border-box}
+/* * {box-sizing: border-box} */
 
-/* Style the tab */
-.tab {
+/* Style the tabs */
+.tabs {
   float: left;
   overflow-y: hidden;
   border: 1px solid #ccc;
@@ -9,13 +9,13 @@
   background-color: #f1f1f1;
   width: 16%;
   /* height: 300px; */
-  height: calc(100vh - 117px);
-  min-height: 143px;
+  height: calc(100vh - 105px);
+  min-height: 136px;
 
 }
 
-/* Style the buttons that are used to open the tab content */
-.tab button {
+/* Style the buttons that are used to open the tabs content */
+.tabs button {
   display: block;
   background-color: inherit;
   color: black;
@@ -29,21 +29,21 @@
 }
 
 /* Change background color of buttons on hover */
-.tab button:hover {
+.tabs button:hover {
   background-color: #ddd;
 }
 
-/* Create an active/current "tab button" class */
-.tab button.active {
+/* Create an active/current "tabs button" class */
+.tabs button.active {
   background-color: #ccc;
 }
 
-/* Style the tab content */
-.tabcontent {
+/* Style the tabs content */
+/* .chatContent {
   float: left;
   padding: 0px 12px;
   border: 1px solid #ccc;
   width: 70%;
   border-left: none;
   height: 300px;
-}
+} */

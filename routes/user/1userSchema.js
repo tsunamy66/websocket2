@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { logger } = require('../../utils/logger');
-const { findSourceMap } = require('module');
 
 const userSchema = new mongoose.Schema({
   username: {

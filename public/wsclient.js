@@ -8,9 +8,9 @@ ws.binaryType = 'blob';
 
 ws.onopen = function () {
     // Get the element with id="defaultOpen" and click on it
-    const tabs = document.getElementsByClassName("tabs")
-    console.log("tabs|>",tabs[0]);
-    tabs[0].querySelector("button#Savedmessage").click();
+    const chatTabs = document.getElementsByClassName("chatTabs");
+    console.log("chatTabs|>",chatTabs[0]);
+    chatTabs[0].querySelector("button#Savedmessage").click();
     setTiltle('connected');
 };
 
@@ -19,7 +19,7 @@ ws.onclose = function () {
 };
 
 ws.onmessage = function ({ data }) {
-    let parsedOnlineUser, parsedBlob
+    let parsedOnlineUser, parsedBlob;
     try {
         parsedOnlineUser = JSON.parse(data);
         createTab(parsedOnlineUser)
@@ -27,7 +27,7 @@ ws.onmessage = function ({ data }) {
     } catch (error) {
         // if (payload.data instanceof Blob) {
         const reader = new FileReader();
-        reader.readAsText(data)
+        reader.readAsText(data);
 
         reader.onload = () => {
             parsedBlob = reader.result;
@@ -48,14 +48,15 @@ document.forms["message"].onsubmit = function () {
     // console.log({ username });
     console.log("input.value");
     var input = document.getElementById("usermsg");
-    const tabs = document.getElementsByClassName("tabs")
-    const activeChatTitle = tabs.getElementsByClassName("chatTitle active")
-    console.log("activeChatTitle|>",activeChatTitle);
+    const chatTabs = document.getElementsByClassName("chatTabs");
+    const active = chatTabs[0].querySelector('button.active'); //button.chatContent
+    // const activeChatTitle = chatTabs.getElementsByClassName("chatTitle active");
+    console.log("activeChatTitle|>",active.id);
     ws.send(input.value);
     printMessage(input.value);
     input.value = "";
     // p.scrollTo(0, nestedElement.scrollHeight);
-    scrollToBottom("chatbox")
+    // scrollToBottom("chatbox");
     // window.scrollTo(0, document.body.scrollHeight)
 };
 
@@ -64,24 +65,24 @@ function setTiltle(title) {
 };
 
 function printMessage(message) {
-    // let index = parsedBlob.indexOf("}") + 1;
-    // let recievedMessage = parsedBlob.slice(index);
-    // let senderUser = parsedBlob.substring(0,index);
-    // console.log("recievedMessage|>",recievedMessage);
-    // console.log("senderUser|>",senderUser);
-    // console.log("printMessage|>", message);
-    // document.querySelector('p.msg').innerHTML = message;
+    // // let index = parsedBlob.indexOf("}") + 1;
+    // // let recievedMessage = parsedBlob.slice(index);
+    // // let senderUser = parsedBlob.substring(0,index);
+    // // console.log("recievedMessage|>",recievedMessage);
+    // // console.log("senderUser|>",senderUser);
+    // // console.log("printMessage|>", message);
+    // // document.querySelector('p.msg').innerHTML = message;
 
-    const p = document.createElement('p');
-    // p.setAttribute("class", "badge rounded-pill bg-secondary");
-    // p.style.fontSize = "20px"
-    p.innerText = message;
-
-    const div = document.createElement("div")
-    const divChatBox = document.querySelector('div.chatbox');
-    divChatBox.appendChild(div)
-    div.appendChild(p)
-    scrollToBottom("chatbox")
+    // const p = document.createElement('p');
+    // // p.setAttribute("class", "badge rounded-pill bg-secondary");
+    // // p.style.fontSize = "20px"
+    // p.innerText = message;
+    
+    // const div = document.createElement("div")
+    // const divChatBox = document.querySelector('div.chatbox');
+    // divChatBox.appendChild(div)
+    // div.appendChild(p)
+    // scrollToBottom("chatbox")
     // linebreak = document.createElement("br");
     // p.appendChild(linebreak);
 };
@@ -108,9 +109,9 @@ function openChat(evt, userName) {
     console.log("chatContent|>",chatContent[0].id);
     for (i = 0; i < chatContent.length; i++) {
         if (chatContent[i].id != userName) {           
-            chatContent[i].style.display = "none";
+            chatContent[i].style.display = "none";//Hide all tabs,
         }else{
-            chatContent[i].style.display = "block";
+            chatContent[i].style.display = "block";//Show the current tab,
         }
     }
 
@@ -120,8 +121,8 @@ function openChat(evt, userName) {
         chatTitle[i].className = chatTitle[i].className.replace(" active", "");
     }
 
-    // Show the current tab, and add an "active" class to the link that opened the tab
-    document.getElementById(userName).style.display = "block";
+    // document.getElementById(userName).style.display = "block";
+    //Add an "active" class to the link that opened the tab
     evt.currentTarget.className += " active";
     console.log("evt\>", evt.currentTarget.className);
 }

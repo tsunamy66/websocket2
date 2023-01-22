@@ -40,11 +40,10 @@ server.on("upgrade", function (req, socket, head) {
       return
     }
     
-    const clientName = clientUser.username
     wss.handleUpgrade(req, socket, head, function (ws) {
       Object.assign(ws, {
         user: {
-          username: clientName,
+          username: clientUser.username,
           id
         }
       })
@@ -83,7 +82,7 @@ wss.on("connection", function connection(ws, req, username) {
     console.log("SERVER SIDE::", message.toString());
   });
 
-  ws.send("Hello",{binary:true}); //ws.emit("message","Hello")
+  // ws.send("Hello",{binary:true}); //ws.emit("message","Hello")
 
   ws.on("close", function close() {
     clients.delete(ws)

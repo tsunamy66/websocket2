@@ -1,7 +1,7 @@
 /* * {box-sizing: border-box} */
 
 /* Style the tabs */
-.tabs {
+.chatTabs {
   float: left;
   overflow-y: hidden;
   border: 1px solid #ccc;
@@ -15,7 +15,7 @@
 }
 
 /* Style the buttons that are used to open the tabs content */
-.tabs button {
+.chatTabs button {
   display: block;
   background-color: inherit;
   color: black;
@@ -29,12 +29,12 @@
 }
 
 /* Change background color of buttons on hover */
-.tabs button:hover {
+.chatTabs button:hover {
   background-color: #ddd;
 }
 
 /* Create an active/current "tabs button" class */
-.tabs button.active {
+.chatTabs button.active {
   background-color: #ccc;
 }
 

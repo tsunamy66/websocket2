@@ -1,6 +1,6 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
-const { saveUser, findUserById, findUserByUsername } = require('./2userMongo')
+const { saveUser, findUserById, findUserByUsername } = require('./2userModel')
 const bcrypt = require("bcryptjs")
 const { logger } = require('../../utils/logger')
 

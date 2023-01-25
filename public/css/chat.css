@@ -65,6 +65,11 @@ a:hover {
   font-weight: bold;
 }
 
+.chatContents {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .chatContent {
   text-align: left;
   margin: 0px;

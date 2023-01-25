@@ -3,7 +3,7 @@ const path = require("path");
 const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser")
-const { userRouter, isLoggedIn } = require("./routes/user/4userRouter");
+const { userRouter, isLoggedIn } = require("./routes/users/4userRouter");
 const { reqLoger } = require("./utils/logger");
 const passport = require("passport");
 

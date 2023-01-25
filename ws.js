@@ -4,7 +4,7 @@ require("dotenv").config();
 const http = require('http');
 const { app, sessionParser } = require("./app");
 const mongoConnect = require("./services/mongo");
-const { findUserById } = require("./routes/user/2userMongo");
+const { findUserById } = require("./routes/users/2userModel");
 
 const MONGO_URI = process.env.MONGO_URI
 
@@ -39,7 +39,7 @@ server.on("upgrade", function (req, socket, head) {
       socket.destroy(error);
       return
     }
-    
+
     wss.handleUpgrade(req, socket, head, function (ws) {
       Object.assign(ws, {
         user: {
@@ -47,14 +47,17 @@ server.on("upgrade", function (req, socket, head) {
           id
         }
       })
-      
+
       console.log("ws.user|>", ws.user);
-      
+
       clients.forEach(function iamonline(client) {
-        if (client !== ws && client.readyState === WebSocket.OPEN && client != ws) {
-          client.send(JSON.stringify(ws.user))
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          //Sends online users: {username : ? , id : ?}
+          client.send(JSON.stringify(ws.user), { binary: true })
+          ws.send(JSON.stringify(client.user), { binary: true })
         }
       })
+
 
       clients.add(ws);
       wss.emit('connection', ws, req, ws.user.username);
@@ -68,16 +71,21 @@ wss.on("connection", function connection(ws, req, username) {
   // console.log("clntName|>", username);
   ws.on("message", function message(message) {
 
-    console.log(`Received message ${message} from user ${username}`);
-    console.log("message|>", message);
-    clients.forEach(function (client) {
-      // console.log("client.username|>",client.user.username);
-      if (client.readyState === WebSocket.OPEN && ws != client) {
-        let messageUsernameId = JSON.stringify(client.user).concat(message.toString())
-        console.log(messageUsernameId);
-        client.send(messageUsernameId,{binary:true});
-      };
-    });
+    const parsedRecievedMessage = JSON.parse(message.toString())
+    if (parsedRecievedMessage.id != "Savedmessage") {
+      // console.log(`Received message ${strMessage} from user ${username}`);
+      clients.forEach(function (client) {
+        // console.log("client.username|>",client.user.username);
+        // let usernameIdMessage = JSON.stringify(client.user).concat(strMessage)
+        if (parsedRecievedMessage.id == client.user.id && client.readyState === WebSocket.OPEN && ws != client) {
+          // console.log('usernameIdMessage|>', usernameIdMessage);
+          client.send(usernameIdMessage, { binary: true });
+        };
+      });
+    }else{
+      //save message in database
+      console.log("parsedRecievedMessage|>", parsedRecievedMessage);
+    }
 
     console.log("SERVER SIDE::", message.toString());
   });
@@ -90,6 +98,18 @@ wss.on("connection", function connection(ws, req, username) {
 
 });
 
+// async function parseRecievedMessage(message) {
+//   const parsedRecievedMessage = JSON.parse(message.toString())
+
+//   // let strMessage = message.toString()
+//   // let index = strMessage.indexOf("}") + 1;
+//   // let recievedMessage = strMessage.slice(index);
+//   // console.log("recievedMessage|>", recievedMessage);
+//   // let recieverUser = strMessage.substring(0, index);
+//   // console.log("recieverUser|>", recieverUser);
+//   // console.log("strMessage|>", strMessage);
+// }
+
 async function start() {
   server.listen(app.get("PORT"), () => {
     console.log(`server is listening on port ${app.get("PORT")}`);
@@ -98,3 +118,7 @@ async function start() {
 }
 
 start();
+
+module.exports = {
+  clients
+}

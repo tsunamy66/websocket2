@@ -1,4 +1,3 @@
-const { logger } = require("../../utils/logger");
 const bcrypt = require('bcryptjs')
 const User = require("./1userSchema")
 

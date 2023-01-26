@@ -23,8 +23,13 @@ async function findUserByUsername(username) {
   return await User.findOne({ username });
 }
 
+async function getAllUsers() {
+  return await User.find({},{password:0,date:0,__v:0})
+}
+
 module.exports = {
   saveUser,
   findUserById,
   findUserByUsername,
+  getAllUsers,
 }

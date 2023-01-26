@@ -4,7 +4,7 @@ require("dotenv").config();
 const http = require('http');
 const { app, sessionParser } = require("./app");
 const mongoConnect = require("./services/mongo");
-const { findUserById } = require("./routes/users/2userModel");
+const { findUserById, getAllUsers } = require("./routes/users/2userModel");
 
 const MONGO_URI = process.env.MONGO_URI
 
@@ -16,8 +16,8 @@ const clients = new Set()
 
 server.on("upgrade", function (req, socket, head) {
   var pathname = require('url').parse(req.url).pathname;
-  console.log("req.path{upgrd}", pathname);
-  console.log("req.headers{upgrd}", req.headers);
+  // console.log("req.path{upgrd}", pathname);
+  // console.log("req.headers{upgrd}", req.headers);
   sessionParser(req, {}, async function () {
 
     if (!req.session?.passport) {
@@ -40,7 +40,7 @@ server.on("upgrade", function (req, socket, head) {
       return
     }
 
-    wss.handleUpgrade(req, socket, head, function (ws) {
+    wss.handleUpgrade(req, socket, head, async function (ws) {
       Object.assign(ws, {
         user: {
           username: clientUser.username,
@@ -48,7 +48,24 @@ server.on("upgrade", function (req, socket, head) {
         }
       })
 
-      console.log("ws.user|>", ws.user);
+      // console.log("ws.user|>", ws.user);
+
+      let allUsers
+      try {
+        allUsers = await getAllUsers();
+        console.log("allUsers|>", allUsers);
+        allUsers.forEach(function (user) {
+          console.log(user._id != id);
+          if (user._id != id) {
+            let newUser = {}
+            newUser.id = user._id
+            newUser.username = user.username
+            ws.send(JSON.stringify(newUser), { binary: true })
+          }
+        })
+      } catch (error) {
+        console.log("Not exist user in mongodb");
+      }
 
       clients.forEach(function iamonline(client) {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -57,7 +74,6 @@ server.on("upgrade", function (req, socket, head) {
           ws.send(JSON.stringify(client.user), { binary: true })
         }
       })
-
 
       clients.add(ws);
       wss.emit('connection', ws, req, ws.user.username);
@@ -82,7 +98,7 @@ wss.on("connection", function connection(ws, req, username) {
           client.send(usernameIdMessage, { binary: true });
         };
       });
-    }else{
+    } else {
       //save message in database
       console.log("parsedRecievedMessage|>", parsedRecievedMessage);
     }

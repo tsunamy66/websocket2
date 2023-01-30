@@ -1,30 +1,40 @@
 const mongoose = require("mongoose")
 
 const messageSchema = new mongoose.Schema({
-  message: {
-    type: String,
-    required: true,
-  },
-  senderuser: {
-    username: {
-      type: String,
-      required: true,
+  messages: [{
+    message: String,
+    senderId: String,
+    // messageId: Number,
+    date: {
+      type: Date,
+      default: Date.now,
     },
-    id: {
-      type: String,
-      required: true,
-    }
+    _id: false,
+  }],
+  users: {
+    ids: [String],
+    usernames: [String],
   },
-  recieveruser: {
-    username: {
-      type: String,
-      required: true,
-    },
-    id: {
-      type: String,
-      required: true,
-    }
-  },
+  // senderuser: {
+  //   username: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   id: {
+  //     type: String,
+  //     required: true,
+  //   }
+  // },
+  // recieveruser: {
+  //   username: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   id: {
+  //     type: String,
+  //     required: true,
+  //   }
+  // },
   date: {
     type: Date,
     default: Date.now,

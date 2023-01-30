@@ -13,16 +13,24 @@ passport.use(new LocalStrategy({ passReqToCallback: true },//To access req
       // console.log({ user });
       return done(null, false, { message: "Incorrect username" });
     }
-    bcrypt.compare(password, user.password, function (err) {
-      if (err) { return done(null, false, "Incorrect password") };
-      done(null, user)
+    console.log(password, user.password);
+    bcrypt.compare(password, user.password, function (err, success) {
+      console.log("success", success);
+      if (err) { //return done(null, false, "Incorrect password") };
+        console.log("bcryptjs: cannot Compare passeword");
+      }
+      if (success) { 
+        return done(null, user) 
+      }else{
+        return done(null, false, "Incorrect password")
+      }
     })
   }
 ))
 
 //initialize req.session.passport 
 passport.serializeUser(function (user, done) {
-  // console.log("serialize|>", user);
+  // console.log("serialize|>", user._id);
   done(null, user._id)
   //Done & returns to req.login while signing up
   //درواقع انجام میشه و برمیگرده به ادامه کار در رک.لاگین موقع ثبت نام
@@ -36,8 +44,8 @@ passport.deserializeUser(async function (id, done) {
 
 function signupGet(req, res, next) {
   // console.log(req.session);
-  res.render("signup",{
-    failSignup : req.session.signupMessage || ""
+  res.render("signup", {
+    failSignup: req.session.signupMessage || ""
   });
   delete req.session.signupMessage
   req.session.save()

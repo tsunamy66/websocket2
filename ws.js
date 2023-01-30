@@ -5,6 +5,7 @@ const http = require('http');
 const { app, sessionParser } = require("./app");
 const mongoConnect = require("./services/mongo");
 const { findUserById, getAllUsers } = require("./routes/users/2userModel");
+const { saveMessage, getAllMessages } = require("./routes/messages/2messageModel");
 
 const MONGO_URI = process.env.MONGO_URI
 
@@ -32,7 +33,7 @@ server.on("upgrade", function (req, socket, head) {
     let clientUser
     const id = req.session.passport.user
     try {
-      clientUser = await findUserById(id)
+      clientUser = await findUserById(id);
       console.log("clntUser|>", clientUser);
     } catch (error) {
       console.log("error findUserById in uograde listener");
@@ -64,7 +65,7 @@ server.on("upgrade", function (req, socket, head) {
           }
         })
       } catch (error) {
-        console.log("Not exist user in mongodb");
+        console.log("can not find user in mongodb");
       }
 
       clients.forEach(function iamonline(client) {
@@ -85,25 +86,50 @@ wss.on("connection", function connection(ws, req, username) {
   console.log(clients.size);
   // console.log("websocket.OPEN|>", WebSocket.OPEN);
   // console.log("clntName|>", username);
-  ws.on("message", function message(message) {
-
+  ws.on("message", async function message(message) {
+    // message Example = {"recieverId":"client.user.id"or"Savedmessage","message":"salam khoobi?"}
     const parsedRecievedMessage = JSON.parse(message.toString())
-    if (parsedRecievedMessage.id != "Savedmessage") {
-      // console.log(`Received message ${strMessage} from user ${username}`);
-      clients.forEach(function (client) {
+
+    if (parsedRecievedMessage.recieverId != "Savedmessage") {
+      console.log(`Received message ${parsedRecievedMessage.message} from user ${username}`);
+      clients.forEach(async function (client) {
         // console.log("client.username|>",client.user.username);
-        // let usernameIdMessage = JSON.stringify(client.user).concat(strMessage)
-        if (parsedRecievedMessage.id == client.user.id && client.readyState === WebSocket.OPEN && ws != client) {
-          // console.log('usernameIdMessage|>', usernameIdMessage);
-          client.send(usernameIdMessage, { binary: true });
+        if (parsedRecievedMessage.recieverId == client.user.id && client.readyState === WebSocket.OPEN && ws != client) {
+
+          Object.assign(parsedRecievedMessage, {
+            senderId: ws.user.id,
+            senderUsername: ws.user.username,
+            recieverUsername: client.user.username,
+          })
+          let senderMessage = {
+            senderId: ws.user.id,
+            // senderUsername: ws.user.username,
+            message: parsedRecievedMessage.message,
+          }
+
+          await saveMessage(parsedRecievedMessage)
+
+          client.send(JSON.stringify(senderMessage), { binary: true });
         };
       });
     } else {
-      //save message in database
-      console.log("parsedRecievedMessage|>", parsedRecievedMessage);
+      Object.assign(parsedRecievedMessage, {
+        senderId: ws.user.id,
+        senderUsername: ws.user.username,
+        recieverUsername: ws.user.username,
+      })
+      await saveMessage(parsedRecievedMessage)
     }
 
-    console.log("SERVER SIDE::", message.toString());
+    if (parsedRecievedMessage.chatContentWithId) {
+      let senderRecieverId = {
+        senderId: ws.user.id,
+        recieverId: parsedRecievedMessage.chatContentWithId
+      }
+      let allMessages = await getAllMessages(senderRecieverId)
+      console.log("allMessages|>",allMessages);
+    }
+    // console.log("SERVER SIDE::", message.toString());
   });
 
   // ws.send("Hello",{binary:true}); //ws.emit("message","Hello")

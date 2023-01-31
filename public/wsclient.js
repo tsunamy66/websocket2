@@ -150,7 +150,8 @@ function openChat(evt, id) {
             chatContent[i].style.display = "none";//Hide all tabs,
         } else {
             chatContent[i].style.display = "flex";//Show the current tab,
-            if (chatContent[i].childElementCount > 1) {
+            console.log("chatContent[i].childElementCount == 1",chatContent[i].childElementCount == 1);
+            if (chatContent[i].childElementCount == 1) {
                 ws.send(JSON.stringify({ chatContentWithId: id })) //give database message
             };
         }
@@ -165,7 +166,7 @@ function openChat(evt, id) {
     // document.getElementById(userName).style.display = "block";
     //Add an "active" class to the link that opened the tab
     evt.currentTarget.className += " active";
-    ws.send(JSON.stringify({ chatContentWithId: id }))
+    // ws.send(JSON.stringify({ chatContentWithId: id }))
     // console.log("evt\>", evt.currentTarget.className);
 
 };

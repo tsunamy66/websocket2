@@ -94,40 +94,63 @@ wss.on("connection", function connection(ws, req, username) {
       console.log(`Received message ${parsedRecievedMessage.message} from user ${username}`);
       clients.forEach(async function (client) {
         // console.log("client.username|>",client.user.username);
+        //Find reciever with Id
         if (parsedRecievedMessage.recieverId == client.user.id && client.readyState === WebSocket.OPEN && ws != client) {
-
+          //Create object to save in database
           Object.assign(parsedRecievedMessage, {
             senderId: ws.user.id,
             senderUsername: ws.user.username,
             recieverUsername: client.user.username,
           })
+          //Create object for send to client
           let senderMessage = {
             senderId: ws.user.id,
             // senderUsername: ws.user.username,
             message: parsedRecievedMessage.message,
           }
-
+          //Save message in Database
           await saveMessage(parsedRecievedMessage)
-
+          //Send to client
           client.send(JSON.stringify(senderMessage), { binary: true });
+          return
         };
       });
+
     } else {
+      //if recieverId == Savedmessage means that the message should only be stored in the database
       Object.assign(parsedRecievedMessage, {
         senderId: ws.user.id,
         senderUsername: ws.user.username,
         recieverUsername: ws.user.username,
       })
       await saveMessage(parsedRecievedMessage)
+      return
     }
 
     if (parsedRecievedMessage.chatContentWithId) {
       let senderRecieverId = {
         senderId: ws.user.id,
-        recieverId: parsedRecievedMessage.chatContentWithId
+        recieverId: parsedRecievedMessage.chatContentWithId,
       }
-      let allMessages = await getAllMessages(senderRecieverId)
-      console.log("allMessages|>",allMessages);
+      try {
+        let allMessages = await getAllMessages(senderRecieverId)
+        console.log("allMessages|>", allMessages);
+        allMessages.messages.forEach(function (msg) {
+
+          let DBmessage = {
+            //The message should be printed in the "class: chatContent" with this ID 
+            senderId: parsedRecievedMessage.chatContentWithId,
+            message: msg.message,
+            //True recieved message from senderId
+            //False sent message to senderId
+            isSender: (msg.senderId != ws.user.id),//true or false
+          }
+          ws.send(JSON.stringify(DBmessage), { binary: true })
+
+        })
+      } catch (error) {
+
+      }
     }
     // console.log("SERVER SIDE::", message.toString());
   });

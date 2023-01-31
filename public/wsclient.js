@@ -15,7 +15,7 @@ ws.onclose = function () {
 };
 
 ws.onmessage = function ({ data }) {
-    // data= {  senderId : " " ,message:"Sometimes"} in BLOB
+    // data= {  senderId : " " ,message:"Sometimes",isSender:"sometimes"} in BLOB
     // data= {  id : "" ,username:""} in BLOB
     // console.log("data|>", data);
     // try {
@@ -33,7 +33,7 @@ ws.onmessage = function ({ data }) {
 
         let parsedBlobData = JSON.parse(reader.result)
         console.log("parsedBlobData|>", parsedBlobData);
-        if (parsedBlobData.message) {
+        if (parsedBlobData.hasOwnProperty("message")) {
             console.log("parsedBlobData|>", parsedBlobData);
 
             createRecievedEl(parsedBlobData);
@@ -41,6 +41,15 @@ ws.onmessage = function ({ data }) {
             let existTitle = document.getElementById(parsedBlobData.id)
             if (!existTitle) {
                 createChatTitleAndChatContent(parsedBlobData)
+            }
+        }
+
+        if (parsedBlobData.hasOwnProperty("isSender")) {
+            if(parsedBlobData.isSender){
+                createRecievedEl(parsedBlobData);
+            }else{
+                parsedBlobData.recieverId = parsedBlobData.senderId
+                createSentEl(parsedBlobData)
             }
         }
     };

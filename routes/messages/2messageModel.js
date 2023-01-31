@@ -78,7 +78,7 @@ async function getAllMessages(data) {
     "users.ids": {
       $all: [data["senderId"], data["recieverId"]]
     }
-  }, { messages:1 })
+  }, { messages:1 ,_id:0})
 }
 
 module.exports = {

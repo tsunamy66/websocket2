@@ -30,11 +30,11 @@ server.on("upgrade", function (req, socket, head) {
     // console.log("req.session{upgrdSess}|>", req.session);
     // console.log("req.url{upgrdSess}|>", req.url);
 
-    let clientUser
+    let wsUser
     const id = req.session.passport.user
     try {
-      clientUser = await findUserById(id);
-      console.log("clntUser|>", clientUser);
+      wsUser = await findUserById(id);
+      console.log("wsUser|>", wsUser);
     } catch (error) {
       console.log("error findUserById in uograde listener");
       socket.destroy(error);
@@ -44,24 +44,25 @@ server.on("upgrade", function (req, socket, head) {
     wss.handleUpgrade(req, socket, head, async function (ws) {
       Object.assign(ws, {
         user: {
-          username: clientUser.username,
+          username: wsUser.username,
           id
         }
       })
 
       // console.log("ws.user|>", ws.user);
 
-      let allUsers
       try {
-        allUsers = await getAllUsers();
+        let allUsers = await getAllUsers();
         console.log("allUsers|>", allUsers);
         allUsers.forEach(function (user) {
           console.log(user._id != id);
           if (user._id != id) {
-            let newUser = {}
-            newUser.id = user._id
-            newUser.username = user.username
-            ws.send(JSON.stringify(newUser), { binary: true })
+            let newUser = {
+              id: user._id,
+              username: user.username,
+              allUsers: true,
+            }
+            ws.send(JSON.stringify(newUser), { binary: true });
           }
         })
       } catch (error) {
@@ -89,27 +90,31 @@ wss.on("connection", function connection(ws, req, username) {
   ws.on("message", async function message(message) {
     // message Example = {"recieverId":"client.user.id"or"Savedmessage","message":"salam khoobi?"}
     const parsedRecievedMessage = JSON.parse(message.toString())
-
-    if (parsedRecievedMessage.recieverId != "Savedmessage") {
+    console.log(parsedRecievedMessage);
+    if (parsedRecievedMessage.recieverId != "Savedmessage" && parsedRecievedMessage.recieverId) {
       console.log(`Received message ${parsedRecievedMessage.message} from user ${username}`);
+
+      //Create object to save in database
+      let clientUsername = await findUserById(parsedRecievedMessage.recieverId)
+      console.log("clientUsername", clientUsername, parsedRecievedMessage.recieverId);
+      Object.assign(parsedRecievedMessage, {
+        senderId: ws.user.id,
+        senderUsername: ws.user.username,
+        recieverUsername: (clientUsername.username),//client.user.username,
+      })
+      //Create object for send to client
+      let senderMessage = {
+        senderId: ws.user.id,
+        // senderUsername: ws.user.username,
+        message: parsedRecievedMessage.message,
+      }
+      //Save message in Database
+      await saveMessage(parsedRecievedMessage)
       clients.forEach(async function (client) {
         // console.log("client.username|>",client.user.username);
         //Find reciever with Id
         if (parsedRecievedMessage.recieverId == client.user.id && client.readyState === WebSocket.OPEN && ws != client) {
-          //Create object to save in database
-          Object.assign(parsedRecievedMessage, {
-            senderId: ws.user.id,
-            senderUsername: ws.user.username,
-            recieverUsername: client.user.username,
-          })
-          //Create object for send to client
-          let senderMessage = {
-            senderId: ws.user.id,
-            // senderUsername: ws.user.username,
-            message: parsedRecievedMessage.message,
-          }
-          //Save message in Database
-          await saveMessage(parsedRecievedMessage)
+
           //Send to client
           client.send(JSON.stringify(senderMessage), { binary: true });
           return
@@ -127,7 +132,7 @@ wss.on("connection", function connection(ws, req, username) {
       return
     }
 
-    if (parsedRecievedMessage.chatContentWithId) {
+    if (parsedRecievedMessage.hasOwnProperty("chatContentWithId")) {
       let senderRecieverId = {
         senderId: ws.user.id,
         recieverId: parsedRecievedMessage.chatContentWithId,

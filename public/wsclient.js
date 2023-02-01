@@ -45,9 +45,9 @@ ws.onmessage = function ({ data }) {
         }
 
         if (parsedBlobData.hasOwnProperty("isSender")) {
-            if(parsedBlobData.isSender){
+            if (parsedBlobData.isSender) {
                 createRecievedEl(parsedBlobData);
-            }else{
+            } else {
                 parsedBlobData.recieverId = parsedBlobData.senderId
                 createSentEl(parsedBlobData)
             }
@@ -150,7 +150,7 @@ function openChat(evt, id) {
             chatContent[i].style.display = "none";//Hide all tabs,
         } else {
             chatContent[i].style.display = "flex";//Show the current tab,
-            console.log("chatContent[i].childElementCount == 1",chatContent[i].childElementCount == 1);
+            console.log("chatContent[i].childElementCount == 1", chatContent[i].childElementCount == 1);
             if (chatContent[i].childElementCount == 1) {
                 ws.send(JSON.stringify({ chatContentWithId: id })) //give database message
             };

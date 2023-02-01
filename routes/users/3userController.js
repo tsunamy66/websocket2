@@ -13,9 +13,9 @@ passport.use(new LocalStrategy({ passReqToCallback: true },//To access req
       // console.log({ user });
       return done(null, false, { message: "Incorrect username" });
     }
-    console.log(password, user.password);
+    // console.log(password, user.password);
     bcrypt.compare(password, user.password, function (err, success) {
-      console.log("success", success);
+      // console.log("success", success);
       if (err) { //return done(null, false, "Incorrect password") };
         console.log("bcryptjs: cannot Compare passeword");
       }

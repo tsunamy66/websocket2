@@ -1,7 +1,7 @@
 const Message = require("./1messageSchma")
 
 async function saveMessage(data) {
-  console.log("data|>", data);//{recieverId: 'Savedmessage',recieverUsername:"J..",message: 'sal...',senderId: '63...',senderUsername:"H.."}
+  console.log("saveMessagedata|>", data);//{recieverId: 'Savedmessage',recieverUsername:"J..",message: 'sal...',senderId: '63...',senderUsername:"H.."}
 
   // Message.findOneAndUpdate({
   //   senderuser: { id: data.senderId },
@@ -29,6 +29,7 @@ async function saveMessage(data) {
   console.log("messageQuery|>", messageQuery);
 
   if (messageQuery === null) {
+    console.log("messageQuery === null|>",messageQuery === null);
     const firstMessageQuery = new Message({
       messages: [{
         message: data["message"],
@@ -38,14 +39,6 @@ async function saveMessage(data) {
         ids: [data["senderId"], data["recieverId"]],
         usernames: [data["senderUsername"], data["recieverUsername"]],
       },
-      // senderuser: {
-      //   username: data["senderUsername"],
-      //   id: data["senderId"],
-      // },
-      // recieveruser: {
-      //   username: data["recieverUsername"],
-      //   id: data["recieverId"],
-      // }
     })
 
     await firstMessageQuery.save();
@@ -64,7 +57,7 @@ async function saveMessage(data) {
           message: data["message"],
           senderId: data["senderId"]
         },
-        senderId: data["senderId"],
+        // senderId: data["senderId"],
       }
     })
 

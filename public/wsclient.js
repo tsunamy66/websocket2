@@ -1,8 +1,5 @@
 const HOST = location.href.replace(/^http/, 'ws');  //'ws://localhost:8080/echo'
-// console.log('window.location.href;;', location.href);
-// const HOST = location.origin.replace(/^http/, 'ws')  //'ws://localhost:8080'
-// console.log('window.location.origin;;',location.origin);
-// console.log('HOST;;',HOST);
+
 const ws = new WebSocket(HOST);
 
 ws.onopen = function () {
@@ -15,43 +12,38 @@ ws.onclose = function () {
 };
 
 ws.onmessage = function ({ data }) {
-    // data= {  senderId : " " ,message:"Sometimes",isSender:"sometimes"} in BLOB
-    // data= {  id : "" ,username:""} in BLOB
-    // console.log("data|>", data);
-    // try {
-    //     //when a user has been connected.The server sends the user & id without message in JSON
-    //     parsedOnlineUser = JSON.parse(data);
-    //     createTab(parsedOnlineUser)
-    //     console.log('parsed0|>', parsedOnlineUser);
-    // } catch (error) {
-    //when a user sends message.the server sends message & sender in BLOB
-    // if (payload.data instanceof Blob) {
+
     const reader = new FileReader();
     reader.readAsText(data);
 
     reader.onload = () => {
-
+        
         let parsedBlobData = JSON.parse(reader.result)
-        console.log("parsedBlobData|>", parsedBlobData);
-        if (parsedBlobData.hasOwnProperty("message")) {
-            console.log("parsedBlobData|>", parsedBlobData);
-
-            createRecievedEl(parsedBlobData);
-        } else {
-            let existTitle = document.getElementById(parsedBlobData.id)
-            if (!existTitle) {
-                createChatTitleAndChatContent(parsedBlobData)
-            }
-        }
-
-        if (parsedBlobData.hasOwnProperty("isSender")) {
-            if (parsedBlobData.isSender) {
+        switch (parsedBlobData.messageStatus) {
+            case "onlineUser":
+                console.log("caseOnlineUser|>", parsedBlobData.messageStatus);
+                let existTitle = document.getElementById(parsedBlobData.id)
+                if (!existTitle) {
+                    createChatTitleAndChatContent(parsedBlobData)
+                }
+                break;
+            case "message":
+                console.log("casemessage|>", parsedBlobData.messageStatus);
                 createRecievedEl(parsedBlobData);
-            } else {
-                parsedBlobData.recieverId = parsedBlobData.senderId
-                createSentEl(parsedBlobData)
-            }
+                break;
+            case "DBmessage":
+                console.log("DBmessage|>", parsedBlobData.messageStatus);
+                if (parsedBlobData.isSender) {
+                    parsedBlobData.recieverId = parsedBlobData.senderId
+                    createSentEl(parsedBlobData)
+                } else {
+                    createRecievedEl(parsedBlobData);
+                }
+                break;
+            default:
+                break;
         }
+
     };
 
 };
@@ -59,16 +51,15 @@ ws.onmessage = function ({ data }) {
 document.forms["message"].onsubmit = function () {
 
     var inputElement = document.getElementById("usermsg");
-    // console.log("input|>", inputElement.value);
-    // const chatTabs = document.getElementsByClassName("chatTabs");
+
     const activeChatTitle = document.querySelector('button.active'); //or 'button.chatTitle.active'
 
     const recieveridMessage = { recieverId: activeChatTitle.id, message: inputElement.value };
     createSentEl(recieveridMessage);
-
+    recieveridMessage.messageStatus = "message"
     ws.send(JSON.stringify(recieveridMessage));
     inputElement.value = "";
-    // scrollToBottom("chatbox");
+
 };
 
 function setTiltle(title) {
@@ -137,22 +128,14 @@ function openChat(evt, id) {
     let i, chatContent, chatTitle, chatContent1;
     // Get all elements with class="chatContent" and hide them
     chatContent = document.getElementsByClassName("chatContent");
-    // chatContent1 = document.querySelector("div[id='" + id + "']")
-    // console.log("chatcontent1.childElementCount|>",chatContent1.childElementCount);
-    // console.log("chatContent1|>",chatContent1);
-    // if (chatContent.length == 0) {
-    //     ws.send(JSON.stringify({ chatContentWithId: id }))
-    // }
     for (i = 0; i < chatContent.length; i++) {
-        console.log("chatContent|>", chatContent[i]);
-        // console.log("chatContent1|>", chatContent1[i]);
         if (chatContent[i].id != id) {
             chatContent[i].style.display = "none";//Hide all tabs,
         } else {
             chatContent[i].style.display = "flex";//Show the current tab,
             console.log("chatContent[i].childElementCount == 1", chatContent[i].childElementCount == 1);
             if (chatContent[i].childElementCount == 1) {
-                ws.send(JSON.stringify({ chatContentWithId: id })) //give database message
+                ws.send(JSON.stringify({ chatContentWithId: id, messageStatus: "DBmessage" })) //give database message
             };
         }
     }
@@ -163,12 +146,7 @@ function openChat(evt, id) {
         chatTitle[i].className = chatTitle[i].className.replace(" active", "");
     }
 
-    // document.getElementById(userName).style.display = "block";
-    //Add an "active" class to the link that opened the tab
     evt.currentTarget.className += " active";
-    // ws.send(JSON.stringify({ chatContentWithId: id }))
-    // console.log("evt\>", evt.currentTarget.className);
-
 };
 
 function clickSavedmessage() {
@@ -177,6 +155,3 @@ function clickSavedmessage() {
     chatTabs[0].querySelector("button#Savedmessage").click();
     setTiltle('connected');
 }
-
-// Get the element with id="defaultOpen" and click on it
-// document.getElementById("defaultOpen").click();

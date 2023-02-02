@@ -1,4 +1,5 @@
 const errorHandler = require("http-errors")
+const http = require('http');
 const path = require("path");
 const express = require("express");
 const session = require('express-session');
@@ -10,7 +11,7 @@ const app = express();
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.set("PORT", process.env.PORT || 8080);
+// app.set("PORT", process.env.PORT || 8080);
 
 app.use(cookieParser())
 app.use(express.json())
@@ -56,8 +57,9 @@ app.use((err, req, res, next) => {
   res.render('error');
 })
 
+const server = http.createServer(app);
 
 module.exports = {
-  app,
+  server,
   sessionParser
 };

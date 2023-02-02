@@ -3,23 +3,6 @@ const Message = require("./1messageSchma")
 async function saveMessage(data) {
   console.log("saveMessagedata|>", data);//{recieverId: 'Savedmessage',recieverUsername:"J..",message: 'sal...',senderId: '63...',senderUsername:"H.."}
 
-  // Message.findOneAndUpdate({
-  //   senderuser: { id: data.senderId },
-  //   recieveruser: { id: data.id }
-  // }, {
-  //   $push: { messages: { message: data.message } }
-  // }, {
-  //   new: true
-  // }, function (err, doc) {
-  //   if (err) {
-  //     console.log("errSavemessage|>", err);
-  //   }
-  //   console.log("doc|>", doc);
-  //   if (doc == null){
-  //     //  یعنی اولین بار است که پیام میخواهد ذخیره شود و عملیات ذخیره اینجا انجام میشه
-  //   }
-  // })
-
   const messageQuery = await Message.findOne({
     "users.ids": {
       $all: [data["senderId"], data["recieverId"]]
@@ -57,7 +40,6 @@ async function saveMessage(data) {
           message: data["message"],
           senderId: data["senderId"]
         },
-        // senderId: data["senderId"],
       }
     })
 

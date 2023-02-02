@@ -1,9 +1,9 @@
-.todohome {
+.msghome {
 	margin: 130px 0 40px 0;
 	position: relative;
 }
 
-.todohome h1 {
+.msghome h1 {
 	position: absolute;
 	top: -140px;
 	width: 100%;
@@ -16,24 +16,24 @@
 	text-rendering: optimizeLegibility;
 }
 
-.todohome section {
+.msghome section {
 	padding-top: 1px;
 	text-align: center;
 }
 
-.todohome h2 {
+.msghome h2 {
 	padding-bottom: 68px;
 	font-size: 26px;
 	font-weight: 300;
 }
 
-.todohome h3 {
+.msghome h3 {
 	/* padding-bottom: 0px; */
 	font-size: 32px;
 	font-weight: 300;
 }
 
-.todohome .button {
+.msghome .button {
 	padding: 13px 45px;
 	font-size: 16px;
 	font-weight: 500;
@@ -42,6 +42,6 @@
 	background: #5e5faf;
 }
 
-.todohome a.button {
+.msghome a.button {
 	text-decoration: none;
 }

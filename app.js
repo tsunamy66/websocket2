@@ -4,7 +4,6 @@ const express = require("express");
 const session = require('express-session');
 const cookieParser = require("cookie-parser")
 const { userRouter, isLoggedIn } = require("./routes/users/4userRouter");
-const { reqLoger } = require("./utils/logger");
 const passport = require("passport");
 
 const app = express();
@@ -25,32 +24,11 @@ const sessionParser = session({
   cookie: { maxAge: 60 * 60 * 1000 }
 });
 
-app.use(function (req, res, next) {
-  // console.log("req.cookies(bfrSes)|>",req.cookies);
-  // console.log("req.signedCookies(bfrSes)|>",req.signedCookies);
-  next()
-}, sessionParser,
-  function (req, res, next) {
-    // console.log("req.signedCookies(aftrSess)|>",req.signedCookies);
-    // console.log("req.session(aftrSess)|>",req.session);
-    // console.log("req.originalUrl(aftrSess)|>",req.originalUrl);
-    // console.log("req.baseUrl(aftrSess)|>",req.baseUrl);
-    // console.log("req.url(aftrSess)|>",req.url);
-    // console.log("req.headers.location(aftrSess)|>",req.headers.location);
-    // console.log("req.referer(aftrSess)|>",req.headers.referer);
-    next()
-  })
+app.use(sessionParser)
 
 //define req.login & req.logout & ...
 //کاربری که ثبت نام شده باشه یعنی پاسپورت در رک.سشن توسط اکسپرس-سشن ضمیمه شده باشه پاسپورت.سشن آنرا به دیسریالایز میفرستد
-app.use(function (req, res, next) {
-  // console.log("req.session bfr passport.sess|>",req.session);
-  // console.log("req.user bfr passport.sess|>",req.user);
-  next()
-}, passport.session(), function (req, res, next) {
-  // console.log("req.user aftr passport.session",req.user);
-  next()
-}) //in req.login
+app.use(passport.session()) //in req.login
 
 app.use('/user', userRouter)
 
@@ -74,11 +52,8 @@ app.get("*", (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-  console.log(err)
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // console.log("req.app.get('env')=>",req.app.get('env')); //development
-  // console.log('process.env.NODE_ENV=>',process.env.NODE_ENV);
   res.status(err.status || 500);
   res.render('error');
 })

@@ -88,8 +88,6 @@ server.on("upgrade", function (req, socket, head) {
 
 wss.on("connection", function connection(ws, req, username) {
   console.log(clients.size);
-  // console.log("websocket.OPEN|>", WebSocket.OPEN);
-  // console.log("clntName|>", username);
   ws.on("message", async function message(message) {
     // message Example = {"recieverId":"client.user.id"or"Savedmessage","message":"salam khoobi?"}
     const parsedRecievedMessage = JSON.parse(message.toString())
@@ -172,25 +170,12 @@ wss.on("connection", function connection(ws, req, username) {
 
 })
 
-// async function parseRecievedMessage(message) {
-//   const parsedRecievedMessage = JSON.parse(message.toString())
-
-//   // let strMessage = message.toString()
-//   // let index = strMessage.indexOf("}") + 1;
-//   // let recievedMessage = strMessage.slice(index);
-//   // console.log("recievedMessage|>", recievedMessage);
-//   // let recieverUser = strMessage.substring(0, index);
-//   // console.log("recieverUser|>", recieverUser);
-//   // console.log("strMessage|>", strMessage);
-// }
-
 async function start() {
   server.listen(app.get("PORT"), () => {
     console.log(`server is listening on port ${app.get("PORT")}`);
   });
   await mongoConnect(MONGO_URI)
 }
-
 
 start();
 

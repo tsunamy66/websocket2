@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { logger } = require('../../utils/logger');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -15,18 +14,6 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
 })
-
-// userSchema.pre('save',function (next) {
-//   if (this.isModified("password") || this.isNew) {
-//     crypto.pbkdf2(this.password, this.salt, 1000, 64, "sha256", function (err, derivedKey) {
-//       if (err) { return next(err); }
-//       logger({derivedKey:derivedKey.toString('hex')});
-//       this.password = derivedKey.toString("hex")
-//       logger({user: this});
-//       next();
-//     })
-//   }
-// });
 
 const User = mongoose.model('User', userSchema)
 

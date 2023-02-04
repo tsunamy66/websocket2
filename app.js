@@ -2,9 +2,9 @@ const { WebSocketServer } = require("ws");
 const WebSocket = require("ws");
 require("dotenv").config();
 const { server, sessionParser } = require("./server");
-const mongoConnect = require("./services/mongo");
-const { findUserById, getAllUsers } = require("./routes/users/2userModel");
-const { saveMessage, getAllMessages } = require("./routes/messages/2messageModel");
+// const mongoConnect = require("./services/mongo");
+// const { findUserById, getAllUsers } = require("./routes/users/2userModel");
+// const { saveMessage, getAllMessages } = require("./routes/messages/2messageModel");
 
 const MONGO_URI = process.env.MONGO_URI
 
@@ -24,43 +24,44 @@ server.on("upgrade", function (req, socket, head) {
 
     let wsUsername
     const id = req.session.passport.user
-    try {
-      wsUsername = await findUserById(id);
-      console.log("wsUser|>", wsUsername);
-    } catch (error) {
-      console.log("error findUserById in uograde listener");
-      socket.destroy(error);
-      return
-    }
+    // try {
+    //   wsUsername = await findUserById(id);
+    //   console.log("wsUser|>", wsUsername);
+    // } catch (error) {
+    //   console.log("error findUserById in uograde listener");
+    //   socket.destroy(error);
+    //   return
+    // }
 
     wss.handleUpgrade(req, socket, head, async function (ws) {
       //Attach user to ws
       Object.assign(ws, {
         user: {
-          username: wsUsername.username,
+          // username: wsUsername.username,
+          username: "admin",
           id
         }
       })
 
       // console.log("ws.user|>", ws.user);
 
-      try {
-        let DbUsers = await getAllUsers();
-        console.log("DbUsers|>", DbUsers);
-        DbUsers.forEach(function (DbUser) {
-          // console.log(user._id != id);
-          if (DbUser._id != id) {
-            let newDbUser = {
-              id: DbUser._id,
-              username: DbUser.username,
-              messageStatus: "onlineUser",
-            }
-            ws.send(JSON.stringify(newDbUser), { binary: true });
-          }
-        })
-      } catch (error) {
-        console.log("can not find user in mongodb");
-      }
+      // try {
+      //   let DbUsers = await getAllUsers();
+      //   console.log("DbUsers|>", DbUsers);
+      //   DbUsers.forEach(function (DbUser) {
+      //     // console.log(user._id != id);
+      //     if (DbUser._id != id) {
+      //       let newDbUser = {
+      //         id: DbUser._id,
+      //         username: DbUser.username,
+      //         messageStatus: "onlineUser",
+      //       }
+      //       ws.send(JSON.stringify(newDbUser), { binary: true });
+      //     }
+      //   })
+      // } catch (error) {
+      //   console.log("can not find user in mongodb");
+      // }
 
       const wsUser = {
         ...ws.user,
@@ -169,7 +170,7 @@ async function start() {
   server.listen(port, () => {
     console.log(`server is listening on port ${port}`);
   });
-  await mongoConnect(MONGO_URI)
+  // await mongoConnect(MONGO_URI)
 }
 
 start();

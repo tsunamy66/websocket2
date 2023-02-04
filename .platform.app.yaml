@@ -45,5 +45,6 @@ disk: 512
 
 
 web:
-  commands: 
+  commands:
+    start: "npm run install" 
     start: "node app.js"        

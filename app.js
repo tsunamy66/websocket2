@@ -176,10 +176,10 @@ async function start() {
 }
 let server = http.createServer(function (request, response) {
   response.writeHead(200, {'Content-Type': 'text/plain'});
-  response.end(' Hello World I am trying to deploy my project but dependencies not installed ');
+  response.end(' Hello World I am trying to deploy my project  dependencies installed :)');
 })
 start();
 
-// module.exports = {
-//   clients
-// }
+module.exports = {
+  clients
+}
